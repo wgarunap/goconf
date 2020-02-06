@@ -3,10 +3,9 @@ package config
 import (
 	"fmt"
 	"github.com/olekukonko/tablewriter"
-	"os"
-
 	"github.com/pickme-go/log/v2"
 	"gopkg.in/oleiade/reflections.v1"
+	"os"
 )
 
 type Configer interface {
