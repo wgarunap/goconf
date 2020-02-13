@@ -1,4 +1,4 @@
-module github.com/wgarunap/config
+module github.com/wgarunap/goconf
 
 go 1.13
 

@@ -1,4 +1,4 @@
-package config
+package goconf
 
 import (
 	"fmt"
@@ -46,7 +46,7 @@ func printTable(p Printer) {
 	for _, field := range fields {
 		value, err := reflections.GetField(pr, field)
 		if err != nil {
-			log.Error("error printing the config table", err)
+			log.Error("error printing the goconf table", err)
 		}
 		data = append(data, []string{field, fmt.Sprint(value)})
 	}

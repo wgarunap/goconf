@@ -1,4 +1,4 @@
-# Config
+# Go Config
 Library to load env configuration
 
 ### How to use it
@@ -13,7 +13,7 @@ var Config Conf
 func (Conf) Register() {
 	err := env.Parse(&Config)
 	if err != nil {
-		log.Fatal("error loading stream config, ", err)
+		log.Fatal("error loading stream goconf, ", err)
 	}
 }
 

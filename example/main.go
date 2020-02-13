@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/caarlos0/env"
 	"github.com/pickme-go/log/v2"
-	"github.com/wgarunap/config"
+	"github.com/wgarunap/goconf"
 	"os"
 )
 
@@ -16,7 +16,7 @@ var Config Conf
 func (Conf) Register() {
 	err := env.Parse(&Config)
 	if err != nil {
-		log.Fatal("error loading stream config, ", err)
+		log.Fatal("error loading stream goconf, ", err)
 	}
 }
 
@@ -33,9 +33,13 @@ func (Conf) Print() interface{} {
 func main() {
 	_ = os.Setenv("MY_NAME", "My First Configuration")
 
-	config.Load(
+	goconf.Load(
 		new(Conf),
 	)
 
-	log.Info(`config successfully loaded`)
+	if Config.Name != `My First Configuration` {
+		log.Fatal(`error while comparing config`)
+	}
+
+	log.Info(`goconf successfully loaded`)
 }
