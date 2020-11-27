@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/caarlos0/env"
-	"github.com/pickme-go/log/v2"
-	"github.com/wgarunap/goconf"
+	"github.com/tryfix/log"
+	"goconf"
 	"os"
 )
 

@@ -3,7 +3,7 @@ package goconf
 import (
 	"fmt"
 	"github.com/olekukonko/tablewriter"
-	"github.com/pickme-go/log/v2"
+	"github.com/tryfix/log"
 	"gopkg.in/oleiade/reflections.v1"
 	"os"
 )
