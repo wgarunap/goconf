@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/caarlos0/env"
+	"github.com/caarlos0/env/v6"
 	"github.com/tryfix/log"
-	"goconf"
+	"github.com/wgarunap/config"
 	"os"
 )
 
