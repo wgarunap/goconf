@@ -9,22 +9,28 @@ import (
 )
 
 type Configer interface {
-	Register()
+	Register() error
 }
 type Validater interface {
-	Validate()
+	Validate() error
 }
 type Printer interface {
 	Print() interface{}
 }
 
-func Load(configs ...Configer) {
+func Load(configs ...Configer) error {
 	for _, c := range configs {
-		c.Register()
+		err := c.Register()
+		if err != nil {
+			return err
+		}
 
 		v, ok := c.(Validater)
 		if ok {
-			v.Validate()
+			err = v.Validate()
+			if err != nil {
+				return err
+			}
 		}
 
 		p, ok := c.(Printer)
@@ -32,6 +38,7 @@ func Load(configs ...Configer) {
 			printTable(p)
 		}
 	}
+	return nil
 }
 
 func printTable(p Printer) {

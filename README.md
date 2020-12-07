@@ -4,23 +4,30 @@ Library to load env configuration
 ### How to use it
 
 ```go
+package main
+import (
+
+"errors"
+"github.com/caarlos0/env/v6"
+"github.com/wgarunap/goconf"
+"log"
+)
+
 type Conf struct {
 	Name string `env:"MY_NAME"`
 }
 
 var Config Conf
 
-func (Conf) Register() {
-	err := env.Parse(&Config)
-	if err != nil {
-		log.Fatal("error loading stream goconf, ", err)
-	}
+func (Conf) Register()error {
+	return env.Parse(&Config)
 }
 
-func (Conf) Validate() {
+func (Conf) Validate() error{
 	if Config.Name == "" {
-		log.Fatal(`MY_NAME environmental variable cannot be empty`)
+		return errors.New(`MY_NAME environmental variable cannot be empty`)
 	}
+    return nil
 }
 
 func (Conf) Print() interface{} {
@@ -28,10 +35,13 @@ func (Conf) Print() interface{} {
 }
 
 func main() {
-	config.Load(
+	err := goconf.Load(
 		new(Conf),
 	)
-    log.Info(`configuration loaded, `,Config.Name)
+    if err != nil{
+           log.Fatal(err)
+    }
+    log.Print(`configuration loaded, `,Config.Name)
 }
 
 ```
