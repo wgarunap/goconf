@@ -2,10 +2,11 @@ package goconf
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/oleiade/reflections"
 	"github.com/olekukonko/tablewriter"
 	"github.com/tryfix/log"
-	"gopkg.in/oleiade/reflections.v1"
-	"os"
 )
 
 type Configer interface {
