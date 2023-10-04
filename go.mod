@@ -3,7 +3,7 @@ module github.com/wgarunap/goconf
 go 1.20
 
 require (
-	github.com/caarlos0/env/v6 v6.4.0
+	github.com/caarlos0/env/v6 v6.10.1
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/tryfix/log v1.0.2
