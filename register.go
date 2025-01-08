@@ -1,12 +1,14 @@
 package goconf
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/oleiade/reflections"
 	"github.com/olekukonko/tablewriter"
-	"github.com/tryfix/log"
+	"os"
+	"reflect"
+)
+
+const (
+	defaultLength    = 10
+	defaultAddLength = 5
 )
 
 type Configer interface {
@@ -45,18 +47,29 @@ func Load(configs ...Configer) error {
 func printTable(p Printer) {
 	table := tablewriter.NewWriter(os.Stdout)
 
-	var data = [][]string{}
+	var data [][]string
 
-	pr := p.Print()
-	var fields []string
-	fields, _ = reflections.Fields(pr)
+	printer := p.Print()
 
-	for _, field := range fields {
-		value, err := reflections.GetField(pr, field)
-		if err != nil {
-			log.Error("error printing the goconf table", err)
+	values := reflect.ValueOf(printer)
+	if values.Kind() == reflect.Ptr {
+		values = values.Elem()
+	}
+
+	if values.Kind() == reflect.Interface {
+		values = values.Elem()
+	}
+
+	for i := 0; i < values.NumField(); i++ {
+		field := values.Field(i)
+		structField := values.Type().Field(i)
+
+		_, ok := structField.Tag.Lookup("secret")
+		if ok {
+			data = append(data, []string{structField.Name, mask(field.String())})
+		} else {
+			data = append(data, []string{structField.Name, field.String()})
 		}
-		data = append(data, []string{field, fmt.Sprint(value)})
 	}
 
 	table.SetHeader([]string{"Config", "Value"})
@@ -64,4 +77,18 @@ func printTable(p Printer) {
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 
 	table.Render()
+}
+
+func mask(value string) string {
+	length := defaultLength
+	if len(value) > defaultLength {
+		length = len(value) + defaultAddLength
+	}
+	runes := make([]rune, length)
+
+	for i := 0; i < length; i++ {
+		runes[i] = '*'
+	}
+
+	return string(runes)
 }

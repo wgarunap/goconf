@@ -1,10 +1,9 @@
 module github.com/wgarunap/goconf
 
-go 1.20
+go 1.23
 
 require (
-	github.com/caarlos0/env/v6 v6.10.1
-	github.com/oleiade/reflections v1.0.1
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/tryfix/log v1.0.2
 )
