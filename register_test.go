@@ -3,11 +3,12 @@ package goconf
 import (
 	"bytes"
 	"errors"
+	"os"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/wgarunap/goconf/mocks"
-	"os"
-	"testing"
 )
 
 func TestLoad(t *testing.T) {
