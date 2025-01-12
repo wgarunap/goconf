@@ -2,10 +2,11 @@ package main
 
 import (
 	"errors"
-	"github.com/caarlos0/env/v11"
-	"github.com/tryfix/log"
-	"github.com/wgarunap/goconf"
+	"log"
 	"os"
+
+	"github.com/caarlos0/env/v11"
+	"github.com/wgarunap/goconf"
 )
 
 type Conf struct {
@@ -38,7 +39,7 @@ func (Conf) Print() interface{} {
 }
 
 func main() {
-	_ = os.Setenv("MY_NAME", "My First Configuration")
+	_ = os.Setenv("MY_NAME", "GoConf")
 	_ = os.Setenv("MY_USERNAME", "testUserName")
 	_ = os.Setenv("MY_PASSWORD", "testUserPassword")
 
@@ -48,9 +49,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if Config.Name != `My First Configuration` {
+	if Config.Name != `GoConf` {
 		log.Fatal(`error while comparing config`)
 	}
 
-	log.Info(`goconf successfully loaded`)
+	log.Println(`configuration successfully loaded`)
 }

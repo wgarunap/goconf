@@ -1,12 +1,13 @@
+//go:generate mockgen -source=register.go -destination=mocks/register_mock.go -package=mocks
+
 package goconf
 
 import (
-	"github.com/olekukonko/tablewriter"
 	"os"
 	"reflect"
-)
 
-//go:generate mockgen -source=register.go -destination=mocks/register_mock.go -package=mocks
+	"github.com/olekukonko/tablewriter"
+)
 
 const SensitiveDataMaskString = "***************"
 
