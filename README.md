@@ -8,7 +8,7 @@ package main
 import (
 
 "errors"
-"github.com/caarlos0/env/v6"
+"github.com/caarlos0/env/v11"
 "github.com/wgarunap/goconf"
 "log"
 )
