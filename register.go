@@ -6,6 +6,8 @@ import (
 	"reflect"
 )
 
+//go:generate mockgen -source=register.go -destination=mocks/register_mock.go -package=mocks
+
 const SensitiveDataMaskString = "***************"
 
 type Configer interface {
