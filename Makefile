@@ -1,4 +1,4 @@
-.PHONY: help install test fmt generate-mocks mock-dependency fmt-dependency lint-dependency
+.PHONY: help install test fmt generate-mocks mock-dependency fmt-dependency lint-dependency check
 
 help: ## Help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -28,3 +28,4 @@ generate-mocks: mock-dependency ## Generate mocks
 test: generate-mocks ## Run tests with race detection
 	@go test -race -count 1 -v ./...
 
+check: fmt lint test ## Check code quality

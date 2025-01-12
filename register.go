@@ -5,6 +5,7 @@ package goconf
 import (
 	"os"
 	"reflect"
+	"strconv"
 
 	"github.com/olekukonko/tablewriter"
 )
@@ -70,9 +71,15 @@ func printTable(p Printer) {
 		secretTag, ok := structField.Tag.Lookup("secret")
 		if ok && secretTag == "true" {
 			data = append(data, []string{structField.Name, SensitiveDataMaskString})
-		} else {
-			data = append(data, []string{structField.Name, field.String()})
+			continue
 		}
+
+		if field.Kind() == reflect.Int {
+			data = append(data, []string{structField.Name, strconv.Itoa(int(field.Int()))})
+			continue
+		}
+
+		data = append(data, []string{structField.Name, field.String()})
 	}
 
 	table.SetHeader([]string{"Config", "Value"})

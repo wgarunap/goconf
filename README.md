@@ -19,9 +19,10 @@ import (
 )
 
 type Conf struct {
-	Name     string `env:"MY_NAME"`
-	Username string `env:"MY_USERNAME" secret:"true"`
-	Password string `env:"MY_PASSWORD" secret:"true"`
+	Name        string `env:"MY_NAME" validate:"required"`
+	ExampleHost string `env:"EXAMPLE_HOST" validate:"required,uri"`
+	Port        int    `env:"EXAMPLE_PORT" validate:"gte=8080,lte=9000"`
+	Password    string `env:"MY_PASSWORD" secret:"true"`
 }
 
 var Config Conf
@@ -31,16 +32,7 @@ func (Conf) Register() error {
 }
 
 func (Conf) Validate() error {
-	if Config.Name == "" {
-		return errors.New(`MY_NAME environmental variable cannot be empty`)
-	}
-	if Config.Username == "" {
-		return errors.New(`MY_USERNAME environmental variable cannot be empty`)
-	}
-	if Config.Password == "" {
-		return errors.New(`MY_PASSWORD environmental variable cannot be empty`)
-	}
-	return nil
+	return goconf.StructValidator(Config)
 }
 
 func (Conf) Print() interface{} {
@@ -48,12 +40,9 @@ func (Conf) Print() interface{} {
 }
 
 func main() {
-	err := goconf.Load(
-		new(Conf),
-	)
-	if err != nil {
+	if err := goconf.Load(new(Conf));err!=nil{
 		log.Fatal(err)
-	}
+    }
 
 	log.Println(`configuration successfully loaded`)
 }
