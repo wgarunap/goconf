@@ -1,13 +1,14 @@
 package goconf
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/oleiade/reflections"
 	"github.com/olekukonko/tablewriter"
-	"github.com/tryfix/log"
+	"os"
+	"reflect"
 )
+
+//go:generate mockgen -source=register.go -destination=mocks/register_mock.go -package=mocks
+
+const SensitiveDataMaskString = "***************"
 
 type Configer interface {
 	Register() error
@@ -45,18 +46,29 @@ func Load(configs ...Configer) error {
 func printTable(p Printer) {
 	table := tablewriter.NewWriter(os.Stdout)
 
-	var data = [][]string{}
+	var data [][]string
 
-	pr := p.Print()
-	var fields []string
-	fields, _ = reflections.Fields(pr)
+	printer := p.Print()
 
-	for _, field := range fields {
-		value, err := reflections.GetField(pr, field)
-		if err != nil {
-			log.Error("error printing the goconf table", err)
+	values := reflect.ValueOf(printer)
+	if values.Kind() == reflect.Ptr {
+		values = values.Elem()
+	}
+
+	if values.Kind() == reflect.Interface {
+		values = values.Elem()
+	}
+
+	for i := 0; i < values.NumField(); i++ {
+		field := values.Field(i)
+		structField := values.Type().Field(i)
+
+		secretTag, ok := structField.Tag.Lookup("secret")
+		if ok && secretTag == "true" {
+			data = append(data, []string{structField.Name, SensitiveDataMaskString})
+		} else {
+			data = append(data, []string{structField.Name, field.String()})
 		}
-		data = append(data, []string{field, fmt.Sprint(value)})
 	}
 
 	table.SetHeader([]string{"Config", "Value"})
