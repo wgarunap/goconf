@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/caarlos0/env/v11"
+
 	"github.com/wgarunap/goconf"
 )
 
@@ -25,12 +26,15 @@ func (Conf) Validate() error {
 	if Config.Name == "" {
 		return errors.New(`MY_NAME environmental variable cannot be empty`)
 	}
+
 	if Config.Username == "" {
 		return errors.New(`MY_USERNAME environmental variable cannot be empty`)
 	}
+
 	if Config.Password == "" {
 		return errors.New(`MY_PASSWORD environmental variable cannot be empty`)
 	}
+
 	return nil
 }
 
@@ -49,6 +53,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	if Config.Name != `GoConf` {
 		log.Fatal(`error while comparing config`)
 	}

@@ -14,9 +14,11 @@ const SensitiveDataMaskString = "***************"
 type Configer interface {
 	Register() error
 }
+
 type Validater interface {
 	Validate() error
 }
+
 type Printer interface {
 	Print() interface{}
 }
@@ -41,6 +43,7 @@ func Load(configs ...Configer) error {
 			printTable(p)
 		}
 	}
+
 	return nil
 }
 
