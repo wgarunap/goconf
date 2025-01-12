@@ -10,65 +10,6 @@ import (
 	"testing"
 )
 
-//type mockConfiger struct {
-//	registerError error
-//}
-//
-//func (m *mockConfiger) Register() error {
-//	return m.registerError
-//}
-//
-//type mockValidater struct {
-//	mockConfiger
-//	validateError error
-//}
-//
-//func (m *mockValidater) Validate() error {
-//	return m.validateError
-//}
-//
-//type mockPrinter struct {
-//	mockValidater
-//	printOutput interface{}
-//}
-//
-//func (m *mockPrinter) Print() interface{} {
-//	return m.printOutput
-//}
-//
-//func TestLoad(t *testing.T) {
-//	mock := &mockPrinter{
-//		mockValidater: mockValidater{
-//			mockConfiger:  mockConfiger{},
-//			validateError: nil,
-//		},
-//		printOutput: struct {
-//			Name  string `secret:"false"`
-//			Value string `secret:"false"`
-//		}{
-//			Name:  "Test",
-//			Value: "1234",
-//		},
-//	}
-//
-//	r, w, _ := os.Pipe()
-//	oldStdOut := os.Stdout
-//	os.Stdout = w
-//
-//	err := Load(mock)
-//	assert.NoError(t, err)
-//
-//	w.Close()
-//	var buf bytes.Buffer
-//	buf.ReadFrom(r)
-//	os.Stdout = oldStdOut
-//
-//	output := buf.String()
-//	assert.Contains(t, output, "Test")
-//	assert.Contains(t, output, "1234")
-//
-//}
-
 func TestLoad(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
