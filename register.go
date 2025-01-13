@@ -1,21 +1,25 @@
+//go:generate mockgen -source=register.go -destination=mocks/register_mock.go -package=mocks
+
 package goconf
 
 import (
-	"github.com/olekukonko/tablewriter"
 	"os"
 	"reflect"
-)
+	"strconv"
 
-//go:generate mockgen -source=register.go -destination=mocks/register_mock.go -package=mocks
+	"github.com/olekukonko/tablewriter"
+)
 
 const SensitiveDataMaskString = "***************"
 
 type Configer interface {
 	Register() error
 }
+
 type Validater interface {
 	Validate() error
 }
+
 type Printer interface {
 	Print() interface{}
 }
@@ -40,6 +44,7 @@ func Load(configs ...Configer) error {
 			printTable(p)
 		}
 	}
+
 	return nil
 }
 
@@ -66,9 +71,15 @@ func printTable(p Printer) {
 		secretTag, ok := structField.Tag.Lookup("secret")
 		if ok && secretTag == "true" {
 			data = append(data, []string{structField.Name, SensitiveDataMaskString})
-		} else {
-			data = append(data, []string{structField.Name, field.String()})
+			continue
 		}
+
+		if field.Kind() == reflect.Int {
+			data = append(data, []string{structField.Name, strconv.Itoa(int(field.Int()))})
+			continue
+		}
+
+		data = append(data, []string{structField.Name, field.String()})
 	}
 
 	table.SetHeader([]string{"Config", "Value"})

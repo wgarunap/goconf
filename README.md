@@ -1,33 +1,38 @@
 # Go Config
-Library to load env configuration
+Library to load env configuration in Golang
+
+### Features
+- Load Env Configuration
+- Print configuration
+- Validate Env Configuration
 
 ### How to use it
 
 ```go
 package main
-import (
 
-"errors"
-"github.com/caarlos0/env/v11"
-"github.com/wgarunap/goconf"
-"log"
+import (
+	"errors"
+	"github.com/caarlos0/env/v11"
+	"github.com/wgarunap/goconf"
+	"log"
 )
 
 type Conf struct {
-	Name string `env:"MY_NAME"`
+	Name        string `env:"MY_NAME" validate:"required"`
+	ExampleHost string `env:"EXAMPLE_HOST" validate:"required,uri"`
+	Port        int    `env:"EXAMPLE_PORT" validate:"gte=8080,lte=9000"`
+	Password    string `env:"MY_PASSWORD" secret:"true"`
 }
 
 var Config Conf
 
-func (Conf) Register()error {
+func (Conf) Register() error {
 	return env.Parse(&Config)
 }
 
-func (Conf) Validate() error{
-	if Config.Name == "" {
-		return errors.New(`MY_NAME environmental variable cannot be empty`)
-	}
-    return nil
+func (Conf) Validate() error {
+	return goconf.StructValidator(Config)
 }
 
 func (Conf) Print() interface{} {
@@ -35,13 +40,10 @@ func (Conf) Print() interface{} {
 }
 
 func main() {
-	err := goconf.Load(
-		new(Conf),
-	)
-    if err != nil{
-           log.Fatal(err)
+	if err := goconf.Load(new(Conf));err!=nil{
+		log.Fatal(err)
     }
-    log.Print(`configuration loaded, `,Config.Name)
-}
 
+	log.Println(`configuration successfully loaded`)
+}
 ```
