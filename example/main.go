@@ -1,17 +1,19 @@
 package main
 
 import (
-	"errors"
-	"github.com/caarlos0/env/v11"
-	"github.com/tryfix/log"
-	"github.com/wgarunap/goconf"
+	"log"
 	"os"
+
+	"github.com/caarlos0/env/v11"
+
+	"github.com/wgarunap/goconf"
 )
 
 type Conf struct {
-	Name     string `env:"MY_NAME"`
-	Username string `env:"MY_USERNAME" secret:"true"`
-	Password string `env:"MY_PASSWORD" secret:"true"`
+	Name        string `env:"MY_NAME" validate:"required"`
+	ExampleHost string `env:"EXAMPLE_HOST" validate:"required,uri"`
+	Port        int    `env:"EXAMPLE_PORT" validate:"gte=8080,lte=9000"`
+	Password    string `env:"MY_PASSWORD" secret:"true"`
 }
 
 var Config Conf
@@ -21,16 +23,7 @@ func (Conf) Register() error {
 }
 
 func (Conf) Validate() error {
-	if Config.Name == "" {
-		return errors.New(`MY_NAME environmental variable cannot be empty`)
-	}
-	if Config.Username == "" {
-		return errors.New(`MY_USERNAME environmental variable cannot be empty`)
-	}
-	if Config.Password == "" {
-		return errors.New(`MY_PASSWORD environmental variable cannot be empty`)
-	}
-	return nil
+	return goconf.StructValidator(Config)
 }
 
 func (Conf) Print() interface{} {
@@ -38,19 +31,15 @@ func (Conf) Print() interface{} {
 }
 
 func main() {
-	_ = os.Setenv("MY_NAME", "My First Configuration")
-	_ = os.Setenv("MY_USERNAME", "testUserName")
+	_ = os.Setenv("MY_NAME", "GoConf")
+	_ = os.Setenv("EXAMPLE_HOST", "https://github.com/wgarunap/goconf")
+	_ = os.Setenv("EXAMPLE_PORT", "8090")
 	_ = os.Setenv("MY_PASSWORD", "testUserPassword")
 
-	err := goconf.Load(
-		new(Conf),
-	)
-	if err != nil {
+	if err := goconf.Load(new(Conf)); err != nil {
 		log.Fatal(err)
 	}
-	if Config.Name != `My First Configuration` {
-		log.Fatal(`error while comparing config`)
-	}
 
-	log.Info(`goconf successfully loaded`)
+	log.Println(`configuration successfully loaded`)
+	log.Printf("%+v", Config)
 }
