@@ -1,8 +1,7 @@
 ## Guidelines
 1. Please complete the below template before submitting the PR. PR will be rejected if this is not completed.
 2. Please tag issue number to title. Example: [01] New Feature X
-3. Any PRs that are not ready to review should have [WIP] tag. Example: [WIP][01] New Feature X
-4. Please do not modify the template.
+3. Please do not modify the template.
 
 ## Description
 Please include a summary of the changes and the related issue.<br>
@@ -30,3 +29,6 @@ Please mark [ x ] which are relevant.
 - [  ] My changes generates no new warnings
 - [  ] I have added tests that prove my fix is effective or my feature works
 - [  ] New and existing unit tests pass locally with my changes
+
+## Test Summary / Screenshots
+Please provide the test summary and necessary screenshots
