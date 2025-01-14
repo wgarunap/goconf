@@ -40,10 +40,10 @@ func (Conf) Print() interface{} {
 }
 
 func main() {
-	if err := goconf.Load(new(Conf));err!=nil{
-		log.Fatal(err)
+    if err := goconf.Load(new(Conf));err!=nil{
+        log.Fatal(err)
     }
-
-	log.Println(`configuration successfully loaded`)
+    
+    log.Println(`configuration successfully loaded`)
 }
 ```
