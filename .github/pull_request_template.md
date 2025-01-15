@@ -23,7 +23,7 @@ Please mark [x] which are relevant.
 - [ ] Bug fix (non-breaking change which fixes the issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality)
-- [ ] This change requires a documentation update
+- [ ] Documentation update
 
 ## Checklist
 
