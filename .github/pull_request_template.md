@@ -42,4 +42,5 @@ Please mark [x] which are relevant.
 Please provide the test summary and necessary screenshots if any. 
 
 ## Add a funny gif
-https://media1.tenor.com/m/OTvZN2KpSZYAAAAd/weekend-bugs.gif
+
+<img src="https://github.com/user-attachments/assets/2c87a759-3177-45db-8558-607e58204873" width="350" />
