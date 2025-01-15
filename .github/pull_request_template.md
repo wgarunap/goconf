@@ -22,20 +22,18 @@ Please mark [x] which are relevant.
 
 - [ ] Bug fix (non-breaking change which fixes the issue)
 - [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality)
-- [ ] Documentation update
+- [ ] Breaking change (change that would break the existing interfaces)
+- [ ] Non-Functional Change (Documentation, Build Pipeline, PR template, etc...)
 
 ## Checklist
 
-- [ ] I have added the issue number and link to this PR.
-- [ ] My PR is only for one issue. If not please mention all the issues above.
+- [ ] My PR is only for one issue. If not please link all the issues in the PR.
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
+- [ ] I have updated the documentation
 - [ ] My changes generates no new warnings
 - [ ] I have added tests that prove my fix is effective or my feature works
-- [ ] New and existing unit tests pass locally with my changes
 
 ## Test Summary / Screenshots
 
