@@ -18,7 +18,8 @@ import "github.com/caarlos0/env/v11"
 //
 //		type Config struct {
 //		    Name string `env:"MY_NAME"`
-//		    Age  int    `env:"MY_AGE"` `
+//		    Age  int    `env:"MY_AGE"`
+//	     	Team string `env:"MY_TEAM" envDefault:"backend"`
 //		}
 //
 //		var conf Config
