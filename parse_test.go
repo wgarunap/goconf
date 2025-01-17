@@ -1,9 +1,10 @@
 package goconf
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type Conf struct {
@@ -12,17 +13,15 @@ type Conf struct {
 	Team string `env:"MY_TEAM"`
 }
 
-func TestParseEnv_Success(t *testing.T) {
+func TestParseEnv(t *testing.T) {
 	updateEnv()
 	tests := []struct {
 		name           string
-		input          Conf
 		expectedOutput Conf
 		errorExpected  bool
 	}{
 		{
-			name:  "Successfully parsed the configs",
-			input: Conf{},
+			name: "Successfully parsed the configs",
 			expectedOutput: Conf{
 				Name: "coderx",
 				Age:  99,
@@ -30,44 +29,23 @@ func TestParseEnv_Success(t *testing.T) {
 			},
 			errorExpected: false,
 		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			err := ParseEnv(&test.input)
-			if !test.errorExpected {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expectedOutput, test.input)
-			} else {
-				assert.Error(t, err)
-			}
-		})
-	}
-}
-
-func TestParseEnv_Failure(t *testing.T) {
-	updateEnv()
-	tests := []struct {
-		name           string
-		input          *Conf
-		expectedOutput *Conf
-		errorExpected  bool
-	}{
 		{
 			name:           "config parse failure scenario",
-			input:          &Conf{},
-			expectedOutput: &Conf{},
+			expectedOutput: Conf{},
 			errorExpected:  true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := ParseEnv(&test.input)
 			if !test.errorExpected {
+				conf := newConf()
+				err := ParseEnv(&conf)
 				assert.NoError(t, err)
-				assert.Equal(t, test.expectedOutput, test.input)
+				assert.Equal(t, test.expectedOutput, conf)
 			} else {
+				confPointer := newPointerToConf()
+				err := ParseEnv(&confPointer)
 				assert.Error(t, err)
 			}
 		})
@@ -78,4 +56,12 @@ func updateEnv() {
 	_ = os.Setenv("MY_NAME", "coderx")
 	_ = os.Setenv("MY_AGE", "99")
 	_ = os.Setenv("MY_TEAM", "backend")
+}
+
+func newConf() Conf {
+	return Conf{}
+}
+
+func newPointerToConf() *Conf {
+	return &Conf{}
 }
