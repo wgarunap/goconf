@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type Conf struct {
@@ -17,36 +18,37 @@ func TestParseEnv(t *testing.T) {
 	updateEnv()
 	tests := []struct {
 		name           string
+		input          Conf
 		expectedOutput Conf
-		errorExpected  bool
+		expectedErr    string
 	}{
 		{
-			name: "Successfully parsed the configs",
+			name:  "Successfully parsed the configs",
+			input: Conf{},
 			expectedOutput: Conf{
 				Name: "coderx",
 				Age:  99,
 				Team: "backend",
 			},
-			errorExpected: false,
+			expectedErr: "",
 		},
 		{
 			name:           "config parse failure scenario",
+			input:          Conf{},
 			expectedOutput: Conf{},
-			errorExpected:  true,
+			expectedErr:    "env: expected a pointer to a Struct",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if !test.errorExpected {
-				conf := newConf()
-				err := ParseEnv(&conf)
+			if test.expectedErr == "" {
+				err := ParseEnv(&test.input)
 				assert.NoError(t, err)
-				assert.Equal(t, test.expectedOutput, conf)
+				assert.Equal(t, test.expectedOutput, test.input)
 			} else {
-				confPointer := newPointerToConf()
-				err := ParseEnv(&confPointer)
-				assert.Error(t, err)
+				err := ParseEnv(test.input)
+				require.ErrorContains(t, err, test.expectedErr)
 			}
 		})
 	}
@@ -56,12 +58,4 @@ func updateEnv() {
 	_ = os.Setenv("MY_NAME", "coderx")
 	_ = os.Setenv("MY_AGE", "99")
 	_ = os.Setenv("MY_TEAM", "backend")
-}
-
-func newConf() Conf {
-	return Conf{}
-}
-
-func newPointerToConf() *Conf {
-	return &Conf{}
 }
