@@ -4,8 +4,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/caarlos0/env/v11"
-
 	"github.com/wgarunap/goconf"
 )
 
@@ -19,7 +17,7 @@ type Conf struct {
 var Config Conf
 
 func (Conf) Register() error {
-	return env.Parse(&Config)
+	return goconf.ParseEnv(&Config)
 }
 
 func (Conf) Validate() error {
