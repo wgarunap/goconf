@@ -13,14 +13,15 @@ package main
 
 import (
 	"errors"
-	"github.com/wgarunap/goconf"
 	"log"
+
+	"github.com/wgarunap/goconf"	
 )
 
 type Conf struct {
 	Name        string `env:"MY_NAME" validate:"required"`
-	ExampleHost string `env:"EXAMPLE_HOST" validate:"required,uri"`
-	Port        int    `env:"EXAMPLE_PORT" validate:"gte=8080,lte=9000"`
+	ExampleHost string `env:"EXAMPLE_HOST" envDefault:"localhost" validate:"required,uri"`
+	Port        int    `env:"EXAMPLE_PORT" envDefault:"8081" validate:"gte=8080,lte=9000"`
 	Password    string `env:"MY_PASSWORD" secret:"true"`
 }
 
