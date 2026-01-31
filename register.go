@@ -83,10 +83,53 @@ func Load(configs ...Configer) error {
 	return nil
 }
 
+// extractFields recursively extracts fields from a struct and returns them as table rows
+func extractFields(prefix string, values reflect.Value) [][]string {
+	var data [][]string
+
+	for i := 0; i < values.NumField(); i++ {
+		field := values.Field(i)
+		structField := values.Type().Field(i)
+
+		fieldName := structField.Name
+		if prefix != "" {
+			fieldName = prefix + "." + fieldName
+		}
+
+		// Check if field is marked as secret
+		secretTag, ok := structField.Tag.Lookup("secret")
+		if ok && secretTag == "true" {
+			data = append(data, []string{fieldName, SensitiveDataMaskString})
+			continue
+		}
+
+		// Handle different field types
+		switch field.Kind() {
+		case reflect.Struct:
+			// Recursively process nested structs
+			nestedData := extractFields(fieldName, field)
+			data = append(data, nestedData...)
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			data = append(data, []string{fieldName, strconv.FormatInt(field.Int(), 10)})
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			data = append(data, []string{fieldName, strconv.FormatUint(field.Uint(), 10)})
+		case reflect.Float32, reflect.Float64:
+			data = append(data, []string{fieldName, strconv.FormatFloat(field.Float(), 'f', -1, 64)})
+		case reflect.Bool:
+			data = append(data, []string{fieldName, strconv.FormatBool(field.Bool())})
+		case reflect.String:
+			data = append(data, []string{fieldName, field.String()})
+		default:
+			// For other types, use string representation
+			data = append(data, []string{fieldName, fmt.Sprintf("%v", field.Interface())})
+		}
+	}
+
+	return data
+}
+
 func printTable(p Printer) error {
 	table := tablewriter.NewWriter(os.Stdout)
-
-	var data [][]string
 
 	printer := p.Print()
 
@@ -99,23 +142,7 @@ func printTable(p Printer) error {
 		values = values.Elem()
 	}
 
-	for i := 0; i < values.NumField(); i++ {
-		field := values.Field(i)
-		structField := values.Type().Field(i)
-
-		secretTag, ok := structField.Tag.Lookup("secret")
-		if ok && secretTag == "true" {
-			data = append(data, []string{structField.Name, SensitiveDataMaskString})
-			continue
-		}
-
-		if field.Kind() == reflect.Int {
-			data = append(data, []string{structField.Name, strconv.Itoa(int(field.Int()))})
-			continue
-		}
-
-		data = append(data, []string{structField.Name, field.String()})
-	}
+	data := extractFields("", values)
 
 	table.Header("Config", "Value")
 
@@ -130,6 +157,32 @@ func printTable(p Printer) error {
 	return nil
 }
 
+// extractJSONFields recursively extracts fields from a struct and returns them as a map for JSON marshaling
+func extractJSONFields(values reflect.Value) map[string]interface{} {
+	configMap := make(map[string]interface{})
+
+	for i := 0; i < values.NumField(); i++ {
+		field := values.Field(i)
+		structField := values.Type().Field(i)
+
+		// Check if field is marked as secret
+		secretTag, ok := structField.Tag.Lookup("secret")
+		if ok && secretTag == "true" {
+			configMap[structField.Name] = SensitiveDataMaskString
+			continue
+		}
+
+		// Handle nested structs recursively
+		if field.Kind() == reflect.Struct {
+			configMap[structField.Name] = extractJSONFields(field)
+		} else {
+			configMap[structField.Name] = field.Interface()
+		}
+	}
+
+	return configMap
+}
+
 func printJSON(p Printer) error {
 	printer := p.Print()
 
@@ -142,20 +195,7 @@ func printJSON(p Printer) error {
 		values = values.Elem()
 	}
 
-	configMap := make(map[string]interface{})
-
-	for i := 0; i < values.NumField(); i++ {
-		field := values.Field(i)
-		structField := values.Type().Field(i)
-
-		secretTag, ok := structField.Tag.Lookup("secret")
-		if ok && secretTag == "true" {
-			configMap[structField.Name] = SensitiveDataMaskString
-			continue
-		}
-
-		configMap[structField.Name] = field.Interface()
-	}
+	configMap := extractJSONFields(values)
 
 	jsonData, err := json.MarshalIndent(configMap, "", "  ")
 	if err != nil {

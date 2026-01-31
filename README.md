@@ -7,15 +7,16 @@ A lightweight, flexible Go library for loading and validating environment-based 
 
 ## Overview
 
-GoConf simplifies environment variable management in Go applications by providing:
-- **Type-safe configuration** - Parse environment variables directly into Go structs
+GoConf simplifies configuration management in Go applications by providing:
+- **Type-safe configuration** - Parse environment variables and YAML files directly into Go structs
+- **Multiple sources** - Load configuration from environment variables or YAML files
 - **Validation** - Built-in validation using struct tags
 - **Default values** - Support for default values when environment variables are not set
 - **Sensitive data masking** - Automatically mask sensitive fields in output
 - **Multiple output formats** - Table format for development, JSON format for production
 - **Zero configuration** - Works out of the box with sensible defaults
 
-Perfect for containerized applications, microservices, and cloud-native deployments where configuration is managed through environment variables following the [12-factor app methodology](https://12factor.net/config).
+Perfect for containerized applications, microservices, and cloud-native deployments where configuration is managed through environment variables following the [12-factor app methodology](https://12factor.net/config) or structured YAML files.
 
 ## Table of Contents
 
@@ -23,7 +24,8 @@ Perfect for containerized applications, microservices, and cloud-native deployme
 - [Quick Start](#quick-start)
 - [Features](#features)
 - [Usage](#usage)
-  - [Basic Configuration](#basic-configuration)
+  - [Environment Variables](#environment-variables)
+  - [YAML Configuration](#yaml-configuration)
   - [Struct Tags](#struct-tags)
   - [Validation](#validation)
   - [Output Formats](#output-formats)
@@ -120,7 +122,9 @@ Set fallback values using the `envDefault` tag when environment variables are no
 
 ## Usage
 
-### Basic Configuration
+### Environment Variables
+
+GoConf supports loading configuration from environment variables with type-safe parsing.
 
 1. **Define your configuration struct** with environment variable mappings:
 
@@ -174,6 +178,85 @@ func main() {
 }
 ```
 
+### YAML Configuration
+
+GoConf supports loading configuration from YAML files, perfect for local development and structured configuration files.
+
+1. **Define your configuration struct** with YAML tag mappings:
+
+```go
+type AppConfig struct {
+    AppName  string `yaml:"app_name"`
+    Port     int    `yaml:"port"`
+    Debug    bool   `yaml:"debug"`
+
+    Database struct {
+        Host     string `yaml:"host"`
+        Port     int    `yaml:"port"`
+        Username string `yaml:"username"`
+        Password string `yaml:"password" secret:"true"`
+    } `yaml:"database"`
+}
+```
+
+2. **Create a YAML configuration file** (`config.yaml`):
+
+```yaml
+app_name: MyApp
+port: 8080
+debug: true
+
+database:
+  host: localhost
+  port: 5432
+  username: dbuser
+  password: secretpass
+```
+
+3. **Implement the Register interface** to load from YAML:
+
+```go
+var Config AppConfig
+
+func (AppConfig) Register() error {
+    return goconf.ParseYaml(&Config, "config.yaml")
+}
+
+func (AppConfig) Validate() error {
+    return goconf.StructValidator(Config)
+}
+
+func (AppConfig) Print() interface{} {
+    return Config
+}
+```
+
+4. **Load configuration**:
+
+```go
+func main() {
+    if err := goconf.Load(new(AppConfig)); err != nil {
+        log.Fatalf("Failed to load config: %v", err)
+    }
+
+    log.Printf("Starting %s on port %d", Config.AppName, Config.Port)
+}
+```
+
+**Output:**
+```
+┌──────────┬────────────┐
+│  CONFIG  │   VALUE    │
+├──────────┼────────────┤
+│ AppName  │ MyApp      │
+│ Port     │ 8080       │
+│ Debug    │ true       │
+│ Database │ {map data} │
+└──────────┴────────────┘
+```
+
+> **Note:** YAML configuration works seamlessly with validation and output formatting, just like environment variables.
+
 ### Struct Tags
 
 GoConf uses struct tags to configure field behavior:
@@ -181,9 +264,18 @@ GoConf uses struct tags to configure field behavior:
 | Tag | Description | Example |
 |-----|-------------|---------|
 | `env` | Environment variable name | `env:"PORT"` |
+| `yaml` | YAML field name | `yaml:"port"` |
 | `envDefault` | Default value if env var not set | `envDefault:"8080"` |
 | `validate` | Validation rules (comma-separated) | `validate:"required,uri"` |
 | `secret` | Mark field as sensitive (masks in output) | `secret:"true"` |
+
+**Example with multiple tags:**
+```go
+type Config struct {
+    Port     int    `yaml:"port" validate:"gte=1024,lte=65535"`
+    Password string `yaml:"password" secret:"true"`
+}
+```
 
 ### Validation
 
@@ -249,7 +341,6 @@ func main() {
     }
 }
 ```
-
 
 ### Interfaces
 

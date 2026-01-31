@@ -42,7 +42,7 @@ func main() {
 
 	// Uncomment the line below to use JSON output format
 	// Useful for centralized logging systems in production
-	goconf.SetOutputFormat(goconf.OutputFormatJSON)
+	// goconf.SetOutputFormat(goconf.OutputFormatJSON)
 
 	if err := goconf.Load(new(Conf)); err != nil {
 		log.Fatal(err)
