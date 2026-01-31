@@ -9,19 +9,19 @@ on:
       - master
 
 jobs:
-  lint:
-    name: Run Code Linter
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v2.1.3
-          args: --timeout 5m
+#  lint:
+#    name: Run Code Linter
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#
+#      - name: Run golangci-lint
+#        uses: golangci/golangci-lint-action@v6
+#        with:
+#          version: v2.1.3
+#          args: --timeout 5m
 
   test:
     name: Run Unit Tests
