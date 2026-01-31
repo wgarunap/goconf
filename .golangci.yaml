@@ -116,10 +116,6 @@ linters:
 
 run:
   tests: false
-  skip-dirs:
-    - mocks
-  skip-files:
-    - ".*_test\\.go$"
 
 issues:
   exclude-rules:
@@ -127,9 +123,20 @@ issues:
         - lll
       source: "^// "
     - path: _test\.go
-      linters-settings: {}
+      linters:
+        - errcheck
+        - lll
+        - revive
+        - whitespace
+        - wsl
+        - gocritic
+        - gocyclo
+        - funlen
+        - gocognit
   exclude-dirs:
     - .tmp
     - .github
     - fixture
     - mocks
+  exclude-files:
+    - ".*_test\\.go$"
