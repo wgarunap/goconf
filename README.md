@@ -27,8 +27,6 @@ Perfect for containerized applications, microservices, and cloud-native deployme
   - [Struct Tags](#struct-tags)
   - [Validation](#validation)
   - [Output Formats](#output-formats)
-- [API Reference](#api-reference)
-- [Examples](#examples)
 - [Best Practices](#best-practices)
 - [Contributing](#contributing)
 - [License](#license)
