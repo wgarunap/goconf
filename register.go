@@ -67,7 +67,9 @@ func Load(configs ...Configer) error {
 					return err
 				}
 			default:
-				printTable(p)
+				if err := printTable(p); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -75,7 +77,7 @@ func Load(configs ...Configer) error {
 	return nil
 }
 
-func printTable(p Printer) {
+func printTable(p Printer) error {
 	table := tablewriter.NewWriter(os.Stdout)
 
 	var data [][]string
@@ -110,9 +112,15 @@ func printTable(p Printer) {
 	}
 
 	table.Header("Config", "Value")
-	table.Bulk(data)
+	if err := table.Bulk(data); err != nil {
+		return fmt.Errorf("failed to add table data: %w", err)
+	}
 
-	table.Render()
+	if err := table.Render(); err != nil {
+		return fmt.Errorf("failed to render table: %w", err)
+	}
+
+	return nil
 }
 
 func printJSON(p Printer) error {
@@ -150,5 +158,6 @@ func printJSON(p Printer) error {
 	// Create a logger that writes to stdout with timestamp
 	logger := log.New(os.Stdout, "", log.LstdFlags)
 	logger.Println(string(jsonData))
+
 	return nil
 }
