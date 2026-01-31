@@ -3,6 +3,9 @@
 package goconf
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -11,6 +14,23 @@ import (
 )
 
 const SensitiveDataMaskString = "***************"
+
+// OutputFormat defines the format for configuration output
+type OutputFormat string
+
+const (
+	// OutputFormatTable outputs configuration as a table (default)
+	OutputFormatTable OutputFormat = "table"
+	// OutputFormatJSON outputs configuration as JSON
+	OutputFormatJSON OutputFormat = "json"
+)
+
+var currentOutputFormat = OutputFormatTable
+
+// SetOutputFormat sets the output format for configuration printing
+func SetOutputFormat(format OutputFormat) {
+	currentOutputFormat = format
+}
 
 type Configer interface {
 	Register() error
@@ -41,7 +61,14 @@ func Load(configs ...Configer) error {
 
 		p, ok := c.(Printer)
 		if ok {
-			printTable(p)
+			switch currentOutputFormat {
+			case OutputFormatJSON:
+				if err := printJSON(p); err != nil {
+					return err
+				}
+			default:
+				printTable(p)
+			}
 		}
 	}
 
@@ -82,9 +109,46 @@ func printTable(p Printer) {
 		data = append(data, []string{structField.Name, field.String()})
 	}
 
-	table.SetHeader([]string{"Config", "Value"})
-	table.AppendBulk(data)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.Header("Config", "Value")
+	table.Bulk(data)
 
 	table.Render()
+}
+
+func printJSON(p Printer) error {
+	printer := p.Print()
+
+	values := reflect.ValueOf(printer)
+	if values.Kind() == reflect.Ptr {
+		values = values.Elem()
+	}
+
+	if values.Kind() == reflect.Interface {
+		values = values.Elem()
+	}
+
+	configMap := make(map[string]interface{})
+
+	for i := 0; i < values.NumField(); i++ {
+		field := values.Field(i)
+		structField := values.Type().Field(i)
+
+		secretTag, ok := structField.Tag.Lookup("secret")
+		if ok && secretTag == "true" {
+			configMap[structField.Name] = SensitiveDataMaskString
+			continue
+		}
+
+		configMap[structField.Name] = field.Interface()
+	}
+
+	jsonData, err := json.MarshalIndent(configMap, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal config to JSON: %w", err)
+	}
+
+	// Create a logger that writes to stdout with timestamp
+	logger := log.New(os.Stdout, "", log.LstdFlags)
+	logger.Println(string(jsonData))
+	return nil
 }

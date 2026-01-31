@@ -34,10 +34,15 @@ func main() {
 	_ = os.Setenv("EXAMPLE_PORT", "8090")
 	_ = os.Setenv("MY_PASSWORD", "testUserPassword")
 
+	// Uncomment the line below to use JSON output format
+	// Useful for centralized logging systems in production
+	goconf.SetOutputFormat(goconf.OutputFormatJSON)
+
 	if err := goconf.Load(new(Conf)); err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println(`configuration successfully loaded`)
+
 	log.Printf("%+v", Config)
 }

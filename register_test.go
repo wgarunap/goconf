@@ -26,7 +26,7 @@ func TestLoad(t *testing.T) {
 			name:           "successful config registration and printing",
 			mockConfig:     mock(ctrl, nil, nil),
 			expectedErr:    nil,
-			expectedOutput: "+--------------+-----------------+\n|    CONFIG    |      VALUE      |\n+--------------+-----------------+\n| DatabaseName | test_db         |\n| Username     | *************** |\n| Password     | *************** |\n+--------------+-----------------+\n",
+			expectedOutput: "┌──────────────┬─────────────────┐\n│    CONFIG    │      VALUE      │\n├──────────────┼─────────────────┤\n│ DatabaseName │ test_db         │\n│ Username     │ *************** │\n│ Password     │ *************** │\n└──────────────┴─────────────────┘\n",
 		},
 		{
 			name:           "config validation failure scenario",
@@ -44,6 +44,66 @@ func TestLoad(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			r, w, _ := os.Pipe()
+			oldStdOut := os.Stdout
+			os.Stdout = w
+
+			err := Load(test.mockConfig)
+			if err == nil {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, test.expectedErr, err)
+			}
+
+			w.Close()
+			var buf bytes.Buffer
+			buf.ReadFrom(r)
+			os.Stdout = oldStdOut
+
+			if err == nil {
+				output := buf.String()
+				assert.Contains(t, output, test.expectedOutput)
+			}
+		})
+	}
+}
+
+func TestLoadWithJSONOutput(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Save original format and restore after test
+	originalFormat := currentOutputFormat
+	defer func() { currentOutputFormat = originalFormat }()
+
+	tests := []struct {
+		name           string
+		outputFormat   OutputFormat
+		mockConfig     Configer
+		expectedErr    error
+		expectedOutput string
+	}{
+		{
+			name:           "successful config registration with JSON output",
+			outputFormat:   OutputFormatJSON,
+			mockConfig:     mock(ctrl, nil, nil),
+			expectedErr:    nil,
+			expectedOutput: `"DatabaseName": "test_db"`,
+		},
+		{
+			name:           "JSON output masks sensitive data",
+			outputFormat:   OutputFormatJSON,
+			mockConfig:     mock(ctrl, nil, nil),
+			expectedErr:    nil,
+			expectedOutput: `"Username": "***************"`,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			SetOutputFormat(test.outputFormat)
+
 			r, w, _ := os.Pipe()
 			oldStdOut := os.Stdout
 			os.Stdout = w
