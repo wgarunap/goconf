@@ -1,3 +1,4 @@
+// Package goconf provides utilities for loading and validating environment-based configuration in Go applications.
 package goconf
 
 import "github.com/caarlos0/env/v11"

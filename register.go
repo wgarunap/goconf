@@ -13,6 +13,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
+// SensitiveDataMaskString is the default mask used to hide sensitive configuration values
 const SensitiveDataMaskString = "***************"
 
 // OutputFormat defines the format for configuration output
@@ -32,18 +33,23 @@ func SetOutputFormat(format OutputFormat) {
 	currentOutputFormat = format
 }
 
+// Configer interface must be implemented by configuration structs
+// to enable environment variable registration
 type Configer interface {
 	Register() error
 }
 
+// Validater interface can be implemented to enable configuration validation
 type Validater interface {
 	Validate() error
 }
 
+// Printer interface can be implemented to enable configuration output
 type Printer interface {
 	Print() interface{}
 }
 
+// Load registers, validates, and prints one or more configuration objects
 func Load(configs ...Configer) error {
 	for _, c := range configs {
 		err := c.Register()
@@ -112,6 +118,7 @@ func printTable(p Printer) error {
 	}
 
 	table.Header("Config", "Value")
+
 	if err := table.Bulk(data); err != nil {
 		return fmt.Errorf("failed to add table data: %w", err)
 	}

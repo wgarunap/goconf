@@ -1,3 +1,5 @@
+version: 2
+
 linters-settings:
   lll:
     line-length: 150
@@ -90,12 +92,9 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
     - mnd
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - lll
@@ -105,8 +104,6 @@ linters:
     - nolintlint
     - revive
     - staticcheck
-    - stylecheck
-    - typecheck
     - unconvert
     - unparam
     - unused
@@ -117,15 +114,22 @@ linters:
     - gocognit
 
 
+run:
+  tests: false
+  skip-dirs:
+    - mocks
+  skip-files:
+    - ".*_test\\.go$"
+
 issues:
   exclude-rules:
     - linters:
         - lll
       source: "^// "
+    - path: _test\.go
+      linters-settings: {}
   exclude-dirs:
     - .tmp
     - .github
     - fixture
     - mocks
-  exclude-files:
-    - .*_test.go

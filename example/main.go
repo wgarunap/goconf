@@ -1,3 +1,4 @@
+// Package main demonstrates the usage of goconf library for loading environment-based configuration
 package main
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/wgarunap/goconf"
 )
 
+// Conf holds the application configuration loaded from environment variables
 type Conf struct {
 	Name        string `env:"MY_NAME" validate:"required"`
 	ExampleHost string `env:"EXAMPLE_HOST" validate:"required,uri"`
@@ -14,16 +16,20 @@ type Conf struct {
 	Password    string `env:"MY_PASSWORD" secret:"true"`
 }
 
+// Config is the global configuration instance
 var Config Conf
 
+// Register loads environment variables into the Config struct
 func (Conf) Register() error {
 	return goconf.ParseEnv(&Config)
 }
 
+// Validate ensures the loaded configuration meets validation requirements
 func (Conf) Validate() error {
 	return goconf.StructValidator(Config)
 }
 
+// Print returns the configuration for display purposes
 func (Conf) Print() interface{} {
 	return Config
 }

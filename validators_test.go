@@ -40,6 +40,7 @@ func TestStructValidator(t *testing.T) {
 			expectedErr: "Error:Field validation",
 		},
 	}
+
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			err := StructValidator(test.config)
@@ -47,6 +48,5 @@ func TestStructValidator(t *testing.T) {
 				require.ErrorContains(t, err, test.expectedErr)
 			}
 		})
-
 	}
 }
