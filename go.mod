@@ -3,7 +3,7 @@ module github.com/wgarunap/goconf
 go 1.24.0
 
 require (
-	github.com/caarlos0/env/v11 v11.3.1
+	github.com/caarlos0/env/v11 v11.4.1
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/golang/mock v1.6.0
 	github.com/olekukonko/tablewriter v1.1.3
